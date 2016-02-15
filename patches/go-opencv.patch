@@ -1,0 +1,57 @@
+diff --git a/opencv/cxcore.go b/opencv/cxcore.go
+index 5c8c927..f64d9c4 100644
+--- a/opencv/cxcore.go
++++ b/opencv/cxcore.go
+@@ -512,6 +512,18 @@ func Not(src, dst *IplImage) {
+
+ //CVAPI(void) cvNot( const CvArr* src, CvArr* dst );
+
++func AbsDiff(src1, src2, dst *IplImage) {
++	C.cvAbsDiff(unsafe.Pointer(src1), unsafe.Pointer(src2), unsafe.Pointer(dst))
++}
++
++//CVAPI(void) cvAbsDiff( const CvArr *src1, const CvArr *src2, CvArr *dst );
++
++func BitwiseAnd(src1, src2, dst, mask *IplImage) {
++	C.cvAnd(unsafe.Pointer(src1), unsafe.Pointer(src2), unsafe.Pointer(dst), unsafe.Pointer(mask))
++}
++
++//CVAPI(void) cvAnd( const CvArr *src1, const CvArr *src2, CvArr *dst, const CvArr *mask );
++
+ /****************************************************************************************\
+ *                                Math operations                              *
+ \****************************************************************************************/
+@@ -524,6 +536,13 @@ func Not(src, dst *IplImage) {
+ *                                    Array Statistics                         *
+ \****************************************************************************************/
+
++func MeanStdDev(src *IplImage, mask *IplImage) (mean, sdev Scalar) {
++	C.cvAvgSdv(unsafe.Pointer(src), (*C.CvScalar)(&mean), (*C.CvScalar)(&sdev), unsafe.Pointer(mask))
++	return
++}
++
++//CVAPI(void) cvAvgSdv( const CvArr *src, CvScalar *mean, CvScalar *stddev, const CvArr *mask);
++
+ /****************************************************************************************\
+ *                      Discrete Linear Transforms and Related Functions       *
+ \****************************************************************************************/
+diff --git a/opencv/imgproc.go b/opencv/imgproc.go
+index 93b8070..b45ce0b 100644
+--- a/opencv/imgproc.go
++++ b/opencv/imgproc.go
+@@ -52,3 +52,15 @@ func Crop(src *IplImage, x, y, width, height int) *IplImage {
+
+ 	return dest
+ }
++
++const (
++	CV_THRESH_BINARY     = int(C.CV_THRESH_BINARY)
++	CV_THRESH_BINARY_INV = int(C.CV_THRESH_BINARY_INV)
++	CV_THRESH_TRUNC      = int(C.CV_THRESH_TRUNC)
++	CV_THRESH_TOZERO     = int(C.CV_THRESH_TOZERO)
++	CV_THRESH_TOZERO_INV = int(C.CV_THRESH_TOZERO_INV)
++)
++
++func Threshold(src, dst *IplImage, threshold, maxvalue float64, thresholdType int) {
++	C.cvThreshold(unsafe.Pointer(src), unsafe.Pointer(dst), C.double(threshold), C.double(maxvalue), C.int(thresholdType))
++}
